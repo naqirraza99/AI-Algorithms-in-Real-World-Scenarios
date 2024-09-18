@@ -45,44 +45,49 @@ def visualize_board(board):
     for i in range(3):
         for j in range(3):
             plt.text(j, i, board[i, j], ha='center', va='center', fontsize=40)
-    plt.xticks([])
-    plt.yticks([])
+    plt.xticks([])  # Hide x ticks
+    plt.yticks([])  # Hide y ticks
     plt.title("Tic Tac Toe Board")
     plt.show()
-
-# Backtracking function to find a solution
-def backtrack(board, current_player):
-    winner = check_winner(board)
-    if winner:
-        return winner
-    
-    if np.all(board != EMPTY):
-        return 'Draw'
-
-    for row in range(3):
-        for col in range(3):
-            if is_valid_move(board, row, col):
-                board[row, col] = current_player
-                visualize_board(board)  # Visualize the current board state
-                result = backtrack(board, PLAYER_X if current_player == PLAYER_O else PLAYER_O)
-                if result:
-                    return result
-                board[row, col] = EMPTY  # Backtrack
-
-    return None
 
 # Start the game
 def play_tic_tac_toe():
     board = initialize_board()
-    result = backtrack(board, PLAYER_X)
-    
-    print("Final Board:")
-    visualize_board(board)
-    
-    if result in [PLAYER_X, PLAYER_O]:
-        print(f"Winner: {result}")
-    else:
-        print("It's a draw!")
+    current_player = PLAYER_X
+
+    while True:
+        visualize_board(board)
+        print(f"Player {current_player}, enter your move (row and column): ")
+        
+        try:
+            row = int(input("Row (0, 1, or 2): "))
+            col = int(input("Column (0, 1, or 2): "))
+
+            if not (0 <= row < 3) or not (0 <= col < 3):
+                print("Invalid input. Please enter numbers between 0 and 2.")
+                continue
+            
+            if is_valid_move(board, row, col):
+                board[row, col] = current_player
+            else:
+                print("Invalid move. That cell is already occupied.")
+                continue
+
+            winner = check_winner(board)
+            if winner:
+                visualize_board(board)
+                print(f"Player {winner} wins!")
+                break
+            
+            if np.all(board != EMPTY):
+                visualize_board(board)
+                print("It's a draw!")
+                break
+            
+            current_player = PLAYER_O if current_player == PLAYER_X else PLAYER_X
+            
+        except ValueError:
+            print("Invalid input. Please enter numeric values.")
 
 # Run the game
 play_tic_tac_toe()

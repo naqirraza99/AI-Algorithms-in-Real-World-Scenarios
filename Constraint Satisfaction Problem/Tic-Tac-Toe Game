@@ -1,0 +1,88 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Constants for players
+PLAYER_X = 'X'
+PLAYER_O = 'O'
+EMPTY = ' '
+
+# Initialize the Tic Tac Toe board
+def initialize_board():
+    return np.full((3, 3), EMPTY)
+
+# Function to check if a move is valid
+def is_valid_move(board, row, col):
+    return board[row, col] == EMPTY
+
+# Function to check for a winner
+def check_winner(board):
+    for row in range(3):
+        if all(board[row, col] == PLAYER_X for col in range(3)):
+            return PLAYER_X
+        if all(board[row, col] == PLAYER_O for col in range(3)):
+            return PLAYER_O
+            
+    for col in range(3):
+        if all(board[row, col] == PLAYER_X for row in range(3)):
+            return PLAYER_X
+        if all(board[row, col] == PLAYER_O for row in range(3)):
+            return PLAYER_O
+            
+    if all(board[i, i] == PLAYER_X for i in range(3)):
+        return PLAYER_X
+    if all(board[i, i] == PLAYER_O for i in range(3)):
+        return PLAYER_O
+    if all(board[i, 2 - i] == PLAYER_X for i in range(3)):
+        return PLAYER_X
+    if all(board[i, 2 - i] == PLAYER_O for i in range(3)):
+        return PLAYER_O
+    
+    return None
+
+# Visualize the current board state
+def visualize_board(board):
+    plt.imshow(board == EMPTY, cmap='gray', vmin=-1, vmax=1)
+    for i in range(3):
+        for j in range(3):
+            plt.text(j, i, board[i, j], ha='center', va='center', fontsize=40)
+    plt.xticks([])
+    plt.yticks([])
+    plt.title("Tic Tac Toe Board")
+    plt.show()
+
+# Backtracking function to find a solution
+def backtrack(board, current_player):
+    winner = check_winner(board)
+    if winner:
+        return winner
+    
+    if np.all(board != EMPTY):
+        return 'Draw'
+
+    for row in range(3):
+        for col in range(3):
+            if is_valid_move(board, row, col):
+                board[row, col] = current_player
+                visualize_board(board)  # Visualize the current board state
+                result = backtrack(board, PLAYER_X if current_player == PLAYER_O else PLAYER_O)
+                if result:
+                    return result
+                board[row, col] = EMPTY  # Backtrack
+
+    return None
+
+# Start the game
+def play_tic_tac_toe():
+    board = initialize_board()
+    result = backtrack(board, PLAYER_X)
+    
+    print("Final Board:")
+    visualize_board(board)
+    
+    if result in [PLAYER_X, PLAYER_O]:
+        print(f"Winner: {result}")
+    else:
+        print("It's a draw!")
+
+# Run the game
+play_tic_tac_toe()
